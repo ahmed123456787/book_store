@@ -13,6 +13,7 @@ import { Navigation } from "swiper/modules";
 
 // import required modules
 import { Pagination } from "swiper/modules";
+import { useFetchAllBooksQuery } from "../../redux/features/books/bookApi";
 
 const categories = [
   "Choose a category",
@@ -23,26 +24,20 @@ const categories = [
 ];
 
 const TopSellers = () => {
-  const [books, setBooks] = useState([]);
+  const { data: booksData = [], error } = useFetchAllBooksQuery();
+  const books = Array.isArray(booksData.books) ? booksData.books : [];
+
   const [selectedCategory, setSelectedCategory] = useState(
     "Choose a category",
   );
-
-  useEffect(() => {
-    fetch("books.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setBooks(data); // Fix: Use fetched data to set state
-      });
-  }, []);
 
   const filterBooks =
     selectedCategory === "Choose a category"
       ? books
       : books.filter(
           (book) =>
-            book.category.toLowerCase() ===
-            selectedCategory.toLowerCase(), // Fix: Use `selectedCategory`
+            book.category?.toLowerCase() ===
+            selectedCategory.toLowerCase(),
         );
 
   return (
@@ -64,39 +59,41 @@ const TopSellers = () => {
         </select>
       </div>
 
-      <Swiper
-        slidesPerView={1}
-        spaceBetween={30}
-        breakpoints={{
-          640: {
-            slidesPerView: 1,
-            spaceBetween: 20,
-          },
-          768: {
-            slidesPerView: 2,
-            spaceBetween: 40,
-          },
-          1024: {
-            slidesPerView: 2,
-            spaceBetween: 50,
-          },
-          1180: {
-            slidesPerView: 3,
-            spaceBetween: 50,
-          },
-        }}
-        navigation={true}
-        modules={[Pagination, Navigation]}
-        className="mySwiper"
-      >
-        {filterBooks.map((book, index) => (
-          <div key={book.id}>
-            <SwiperSlide key={index}>
+      {filterBooks.length > 0 ? (
+        <Swiper
+          slidesPerView={1}
+          spaceBetween={30}
+          breakpoints={{
+            640: {
+              slidesPerView: 1,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 40,
+            },
+            1024: {
+              slidesPerView: 2,
+              spaceBetween: 50,
+            },
+            1180: {
+              slidesPerView: 3,
+              spaceBetween: 50,
+            },
+          }}
+          navigation={true}
+          modules={[Pagination, Navigation]}
+          className="mySwiper"
+        >
+          {filterBooks.map((book, index) => (
+            <SwiperSlide key={book.id || index}>
               <BookCard book={book} />
             </SwiperSlide>
-          </div>
-        ))}
-      </Swiper>
+          ))}
+        </Swiper>
+      ) : (
+        <p>No books available for the selected category.</p>
+      )}
     </div>
   );
 };

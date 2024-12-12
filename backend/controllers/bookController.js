@@ -12,9 +12,9 @@ const createBook = async (req, res) => {
 
 const getAllBooks = async (req, res) => {
   try {
+    console.log("Define");
     const books = await Book.find({});
     res.status(200).send({
-      message: "success",
       books: books,
     });
   } catch (e) {}

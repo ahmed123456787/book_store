@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
+import { userAuth } from "../context/authContext";
 
 const Register = () => {
   const [message, setMessage] = useState("");
-  // console.log(registerUser)
+  const { registerUser } = userAuth();
   const {
     register,
     handleSubmit,
@@ -13,9 +14,17 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
-  //   register user
-
-  const onSubmit = (data) => console.log(data);
+  //   register the user .
+  const onSubmit = async (data) => {
+    try {
+      console.log(data.email, data.password);
+      await registerUser(data.email, data.password);
+      alert("user registration succeful");
+    } catch (error) {
+      setMessage("please provide a valid email or password");
+      console.log(error);
+    }
+  };
 
   return (
     <div className="h-[calc(100vh-120px)] flex justify-center items-center ">
